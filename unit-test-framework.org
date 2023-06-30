@@ -1,0 +1,131 @@
+#+title: A simple Unit Test framework in Lisp
+#+date: <2021-01-11>
+#+keywords: draft
+#+setupfile: ../org-templates/post.org
+
+[[http://www.gigamonkeys.com/book/practical-building-a-unit-test-framework.html][Chapter 9 of Peter Siegel's book Practical Common Lisp]] presents an interesting application for Lisp macros: a language for defining simple unit tests.
+
+This article provides a use case for that unit test language. For more details about macros, please read the aforementioned chapter of Peter Siegel's book.
+
+We assume you are using either emacs+slime or common-lisp-jupyter to load and run your programs. 
+
+** Creating and running test cases: steps
+
+*** Step 1: defining the unit test language
+
+- *Emacs+slime users*: =C-x C-f= to create a new buffer called *unit-test.lisp*, copy paste the program below in a buffer, =C-x C-s= to save it, then load the program by executing the command below on the REPL:
+  #+begin_src lisp
+  USER-RTL> (load "unit-test.lisp")
+  #+end_src
+- *common-lisp-jupyter users*: copy paste the program below in a common-lisp code cell, then load it by clicking on /Run/.
+
+#+begin_src lisp
+  ;; Macros
+
+  (defvar *test-name* nil)
+
+  (defun report-result (result form)
+    (format t "~:[FAIL~;pass~] ...~a: ~a~%" result *test-name* form)
+    result)
+
+  (defmacro with-gensyms ((&rest names) &body body)
+    `(let ,(loop for n in names collect `(,n (gensym)))
+       ,@body))
+
+  (defmacro combine-results (&body forms)
+    (with-gensyms (result)
+      `(let ((,result t))
+         ,@(loop for f in forms collect `(unless ,f (setf ,result nil)))
+         ,result)))
+
+  (defmacro check (&body forms)
+    `(combine-results
+       ,@(loop for f in forms collect `(report-result ,f ',f))))
+
+  (defmacro deftest (name parameters &body body)
+    `(defun ,name ,parameters
+       (let ((*test-name* (append *test-name* (list ',name))))
+         ,@body)))
+#+end_src
+
+*** Step 2: creating your lisp program
+
+Suppose we would like to test the lisp program below consisting of the definition of function COUNT-VOWELS.
+
+- *Emacs+slime users*: =C-x C-f= to create a new buffer called *my-program.lisp*, copy paste the program below in a buffer, =C-x C-s" to save it, then load the program by executing the command below on the REPL:
+  #+begin_src lisp
+  USER-RTL> (load "my-program.lisp")
+  #+end_src
+- *common-lisp-jupyter users*: copy paste the program below in a new common-lisp code cell, then load it by clicking on /Run/.
+
+#+begin_src lisp
+
+  (defun count-vowels (str)
+    (do ((i 0 (1+ i))
+         (acc 0)
+         (len (length str)))
+        ((= i len) acc)
+      (when (or (equal (aref str i) #\a) (equal (aref str i) #\e)
+                (equal (aref str i) #\i) (equal (aref str i) #\o)
+                (equal (aref str i) #\u))
+        (:= acc (1+ acc)))))
+#+end_src
+
+
+*** Step 3: creating the unit tests
+
+Now it is time to define the unit tests for the functions of your program.
+
+- *Emacs+slime users*: =C-x C-f= to create a new buffer called *test.lisp*, copy paste the program below in a buffer, =C-x C-s" to save it, then load the program by executing the command below on the REPL:
+  #+begin_src lisp
+  USER-RTL> (load "test.lisp")
+  #+end_src
+- *common-lisp-jupyter users*: copy paste the program below in a new common-lisp code cell, then load it by clicking on /Run/.
+
+#+begin_src lisp
+  (deftest test-count-vowels ()              
+    (check                     
+      (= (count-vowels "") 0)  ; Assertions
+      (= (count-vowels "b") 0)
+      (= (count-vowels "Assdva") 1)))
+
+  (defun main ()                              
+    (test-count-vowels))
+#+END_SRC
+
+
+*** Step4: running your tests
+
+To run your tests,
+- *emacs+slime users* type (MAIN) in the REPL
+- *common-lisp jupyter users*  type (MAIN) in a new code cell and click on /Run/
+#+begin_src lisp
+RTL-USER> (main)
+pass ...(TEST-COUNT-VOWELS): (= (COUNT-VOWELS ) 0)
+pass ...(TEST-COUNT-VOWELS): (= (COUNT-VOWELS b) 0)
+pass ...(TEST-COUNT-VOWELS): (= (COUNT-VOWELS Assdva) 1)
+T
+#+end_src
+
+** More on assertions
+
+- The last step in writing a test is to validate the output against a known response (this is called an *assertion*)
+- Best practices:
+  - Make sure tests are repeatable. 
+  - Try and assert results that relate to your input data.
+
+The example below shows assertions for function HAS-VOWELS which returns T its input string contains at least one vowel.
+#+begin_src lisp
+(deftest test-has-vowels ()
+  (check (not (has-vowels ""))
+         (has-vowels "b")
+	 (has-vowels "bcde")))
+#+end_src	 
+#+begin_src
+RTL-USER> (test-has-vowels)
+pass ...(TEST-HAS-VOWELS): (NOT (HAS-VOWELS ))
+fail ...(TEST-HAS-VOWELS): (HAS-VOWELS b)
+pass ...(TEST-HAS-VOWELS): (HAS-VOWELS bcde)
+T
+#+end_src
+
