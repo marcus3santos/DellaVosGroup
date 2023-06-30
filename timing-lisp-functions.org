@@ -1,0 +1,127 @@
+#+title: Timing Lisp functions
+#+date: <2021-01-25 Mon>
+#+filetags: github org-mode orgmode emacs template sample
+#+setupfile: ../org-templates/post.org
+
+* Preamble
+
+This quick tutorial assumes you already know the basics of programming in Lisp using Emacs/Slime, and that you have installed the [[https://github.com/vseloved/rutils][RUTILS]] lisp package.
+
+As we will be plotting algorithm performance data, I also assume you are familiar with graphing utilities. I encourage you to use Gnuplot. There are many online tutorials on how to use it. I like [[https://people.duke.edu/~hpgavin/gnuplot.html][this one]].
+
+* Common Lisp's timing untilities
+
+Common Lisp provides a standard utility for performance measurement, TIME:
+
+#+begin_src lisp
+RTL-USER> (time (find 4 (make-array 1000000)))
+Evaluation took:
+  0.008 seconds of real time
+  0.007880 seconds of total run time (0.007860 user, 0.000020 system)
+  100.00% CPU
+  25,149,964 processor cycles
+  8,000,016 bytes consed
+#+end_src
+However, TIME merely prints textual information to trace output. Hence, the information is not readily available for further processing, except by parsing it in a CL-implementation-specific manner, and this is precisely what we will do.
+
+The TIMEF macro below returns as values the timing information that TIME prints to *trace-output*, in the following order: run time, real time, % of CPU, and # of processor cycles.
+#+begin_src lisp
+;; timing.lisp
+
+(defun tweak-text (lst)
+  (when lst
+    (let ((item (car lst))
+	  (rest (cdr lst)))
+      (if (or (eql item #\()
+	      (eql item #\))
+	      (eql item #\,)
+	      (eql item #\:)
+	      (eql item #\%))
+	  (tweak-text rest)
+	  (cons item (tweak-text rest))))))
+	    
+(defun sl-string->list (line)
+  (with-input-from-string (s line)
+    (loop for object = (read s nil nil)
+       while object
+	 collect object)))
+  
+(defun ml-string->list (string)
+  (with-input-from-string (s string)
+    (loop for line = (read-line s nil nil)
+       while line
+       collect (sl-string->list line))))
+
+(defun parse-str (str)
+  (ml-string->list (coerce (tweak-text (coerce str 'list))
+			   'string)))
+
+(defmacro timef (exp)
+  "Returns as values the timing information that
+TIME prints to *trace-output*, in the following order: 
+run time, real time, % of CPU, and # of processor cycles."
+  (let ((g (gensym)))
+    `(let ((,g (cdr (parse-str (with-output-to-string (*trace-output*)
+				 (time ,exp))))))
+       (values (caadr ,g)       ; run time
+	       (caar ,g)        ; real time
+	       (caaddr ,g)      ; % of CPU
+	       (car (cadddr ,g)))))) ; # of processor cycles
+#+end_src
+An example of using the TIMEF macro to obtain the runtime for a call to function FIND.
+#+begin_src lisp
+RTL-USER> (timef (find 4 (make-array 1000000)))
+0.010317
+0.011
+90.91
+32934025
+#+end_src
+
+* Timing a function considering different parameter values
+
+The steps below show how to use TIMEF to measure the runtime of function FIND for different array sizes. 
+
+*Step 1*: Using the terminal shell, type the following commands to create a dedicated folder for your experiment, and open emacs to edit a new file called *timing.lisp*
+#+begin_example
+$ cd
+$ mkdir timing
+$ cd timing
+$ emacs -nw timing-experiment.lisp
+#+end_example
+
+*Step 2*: Type in the program below in your *timing-experiment.lisp* buffer. This program times the execution of the function call *(find 3  x)*, where *x* is an array contain only zeros.
+#+begin_src lisp
+  (load "timing.lisp")  ; assuming you have saved the above timing.lisp
+                          ; file in your current folder
+  (with-open-file (s "output.dat" :direction :output :if-exists :supersede)
+    (do* ((init 10000)
+          (incr 20000)
+          (lim 1000000)
+          (reps 50)
+          (i init (+ i incr))
+          (k 0 (1+ k)))
+         ((> i lim))
+      (let ((x (make-array i))
+            (acc 0))
+        (dotimes (j reps)
+          (setf acc (+ acc (timef (find 3  x)))))
+        (format s "~a ~F~%" i (/ acc reps)))))
+#+end_src
+
+*Step 3*: To run the program, =C-c C-k=. The program creates a data file called *output.dat* in you local folder.
+
+*Step 4*: To graph the data using gnuplot, let's first open the emacs shell: =M-x=  type *eshell* in the minibuffer and press =Enter=.
+
+*Step 5*: Type the following commands on the shell:
+#+begin_example
+$ gnuplot   # This command will open the gnuplot shell
+gnuplot> set xlabel "Array size"
+gnuplot> set ylabel "Runtime"
+gnuplot> plot "output.dat" w lp plot
+#+end_example
+Gnuplot will then show you the following graph in a new window:
+#+begin_export html
+<center>
+<img src=http://www.cs.ryerson.ca/m3santos/Blog-images/output.png>
+</center>
+#+end_export
