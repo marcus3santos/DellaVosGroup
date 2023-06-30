@@ -1,8 +1,15 @@
 #+title: Investigating the Internet using Lisp
 #+Author: Della-Vos Group
 
+* Introduction
+  
+To investigate the internet you will need an http client tool, some
+data visualization tool, and you may need a natural language
+processing system.
 
-There are two ways to investigate Internet content with Lisp. The first is to use an http client tool, for example:
+* Http clients
+  
+Examples of http clients built in Lisp:
 
 - https://edicl.github.io/drakma/
 
@@ -14,25 +21,31 @@ There are two ways to investigate Internet content with Lisp. The first is to us
 
 - https://github.com/svenvc/s-http-client
 
-The last four http clients are better than drakma, for their small footprint.
 
-For best results, you should also use a natural language processing system, such as the tagger:
+* Data visualization
 
-https://github.com/g000001/tagger
-
-Of course, if you use the tagger or another system in Common Lisp, don't forget to use quicklisp to install. A good example of how to show results and make research reports on the Internet is this COVID-19 data exploration system:
+A good example of how to show results and make research reports on the
+Internet is this COVID-19 data exploration system:
 
 https://github.com/dnaeon/cl-covid19
 
-Of course, what I mentioned above is for amateur systems. If you really want powerful systems, then you'll need to contact Cycorp:
+
+* Natural language processing
+
+For best results when exploring the internet, you should also use a
+natural language processing system, such as the tagger:
+
+https://github.com/g000001/tagger
+
+
+If you really want powerful systems, then you'll need to contact Cycorp:
 
 https://www.cyc.com/
 
-Cycorp offers powerful natural language resources and is being used in large projects, such as the Cleveland Clinic's natural language interface for biomedical information:
-
-
-- https://my.clevelandclinic.org/
-
-- https://sanctuary.ai/
+Cycorp offers powerful natural language resources and is being used in
+large projects, such as the Cleveland Clinic's natural language
+interface for biomedical information
+(https://my.clevelandclinic.org/), and Sanctuary.ai's robots that have
+human-like AI ( https://sanctuary.ai/)
 
 
