@@ -1,4 +1,4 @@
-#+TITLE: Blog Index
+#+TITLE: Articles
 
 - *[[file:post-04.org][Investigating the Internet using Lisp]]*
   #+html: <p class='pubdate'>by Della-Vos Group on Jun 30, 2023.</p>
@@ -6,19 +6,9 @@
   #+html: <p class='pubdate'>by Della-Vos Group on Jun 30, 2023.</p>
 - *[[file:lisp-from-python.org][Calling Lisp from Python]]*
   #+html: <p class='pubdate'>by Della-Vos Group on Jun 30, 2023.</p>
-- *[[file:lisp-ide.org][Getting your Emacs/Slime-based Lisp programming environment up and running for CPS305]]*
-  #+html: <p class='pubdate'>by Marcus Santos on Apr 04, 2023.</p>
 - *[[file:timing-lisp-functions.org][Timing Lisp functions]]*
   #+html: <p class='pubdate'>by Marcus Santos on Jan 25, 2021.</p>
-- *[[file:bolo-de-milho.org][Brazilian "Bolo de milho" (corncake) recipe]]*
-  #+html: <p class='pubdate'>by Marcus Santos on Jan 14, 2021.</p>
 - *[[file:unit-test-framework.org][A simple Unit Test framework in Lisp]]*
   #+html: <p class='pubdate'>by Marcus Santos on Jan 11, 2021.</p>
-- *[[file:common-lisp-jupyter.org][Getting your notebook-style environment for experimenting with Lisp programming up and running]]*
-  #+html: <p class='pubdate'>by Marcus Santos on Dec 20, 2020.</p>
-- *[[file:post-03.org][Pão de Queijo Recipe]]*
-  #+html: <p class='pubdate'>by Marcus Santos on Aug 26, 2020.</p>
-- *[[file:post-02.org][Tried-and-True French Bread Recipe]]*
-  #+html: <p class='pubdate'>by Marcus Santos on Aug 25, 2020.</p>
 - *[[file:post-01.org][Blogging with Emacs Org mode (I)]]*
   #+html: <p class='pubdate'>by Marcus Santos on Aug 19, 2020.</p>
