@@ -1,0 +1,14 @@
+#+TITLE: Articles
+
+- *[[file:interfacing-lisp-alpaca.org][Exploring and Harnessing the Power of a Local Large Language Model (LLM)]]*
+  #+html: <p class='pubdate'>by Della-Vos Group on Jun 30, 2023.</p>
+- *[[file:lisp-from-python.org][Calling Lisp from Python]]*
+  #+html: <p class='pubdate'>by Della-Vos Group on Jun 30, 2023.</p>
+- *[[file:post-04.org][Investigating the Internet using Lisp]]*
+  #+html: <p class='pubdate'>by Della-Vos Group on Jun 30, 2023.</p>
+- *[[file:timing-lisp-functions.org][Timing Lisp functions]]*
+  #+html: <p class='pubdate'>by Della-Vos Group on Jan 25, 2021.</p>
+- *[[file:unit-test-framework.org][A simple Unit Test framework in Lisp]]*
+  #+html: <p class='pubdate'>by Della-Vos Group on Jan 11, 2021.</p>
+- *[[file:post-01.org][Blogging with Emacs Org mode (I)]]*
+  #+html: <p class='pubdate'>by Della-Vos Group on Aug 19, 2020.</p>
